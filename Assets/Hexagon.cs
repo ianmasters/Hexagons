@@ -13,6 +13,7 @@ public class Hexagon : MonoBehaviour
 
     private void Awake()
     {
+        // Notice that depending on engine requirements all this stuff is essentially static / single setup.
         // Setup plane equations from 3 of the hexagon points.
         // This needs done only once for all hexagons as we work in local space.
         var euler = transform.rotation.eulerAngles;
@@ -22,12 +23,15 @@ public class Hexagon : MonoBehaviour
 
         // One of the corner points
         var p = new Vector3(0, radius, 0); // texture is pointy top hexagon
+        // Rotate into position for the 3 points we want to generate the 2 planes.
         var p0 = p.Rotated(0, 0, angleOffsetDegrees);
         var p1 = p.Rotated(0, 0, angleOffsetDegrees - 60);
         var p2 = p.Rotated(0, 0, angleOffsetDegrees - 120);
+        // Find normals for the two planes
         var n0 = ((p0 + p1) * .5f).normalized;
         var n1 = ((p1 + p2) * .5f).normalized;
 
+        // Generate the planes.
         plane0 = new Plane(n0, p0);
         plane1 = new Plane(n1, p1);
 
@@ -40,17 +44,16 @@ public class Hexagon : MonoBehaviour
         cursorRenderer.material = IsInside(cursorPosLocal) ? insideMaterial : outsideMaterial;
     }
 
+    // This is the run time meat of the problem.
+    // Absolute the local point into the planes quadrant.
+    // Two dot products and additions for the plane checks.
+    // Very fast. No trigonometry required.
     private bool IsInside(Vector3 pointLocal)
     {
+        // Get the absolute point within the quadrant our two planes are in.
         var p = new Vector3(Mathf.Abs(pointLocal.x), Mathf.Abs(pointLocal.y), Mathf.Abs(pointLocal.z));
-
-        // Debug.Log($"plane0: {plane0.ToString()}\nplane1: {plane1.ToString()}");
-        // Debug.Log($"ina:{ina} inb:{inb}");
-        
-        var out0 = plane0.GetSide(p);
-        if (out0) return false; // early out if outside this plane
-        var out1 = plane1.GetSide(p);
-        return !out1;
-        // return !out0 && !out1;
+        // Check the planes and early return if outside.
+        if (plane0.GetSide(p)) return false;
+        return !plane1.GetSide(p);
     }
 }
