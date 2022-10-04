@@ -16,6 +16,8 @@ public class Hexagon : MonoBehaviour
         // Setup plane equations from 3 of the hexagon points.
         // This needs done only once for all hexagons as we work in local space.
         var euler = transform.rotation.eulerAngles;
+        
+        // If you want flat top hexagons and don't want to rotate the hexagon/grid object, add 30 to this.
         var angleOffsetDegrees = euler.z;
 
         // One of the corner points
