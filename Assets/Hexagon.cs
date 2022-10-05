@@ -57,7 +57,7 @@ public class Hexagon : MonoBehaviour
         pointLocal.y = Mathf.Abs(pointLocal.y);
         pointLocal.z = Mathf.Abs(pointLocal.z);
         
-        // Check the planes and return if on negative side of either.
+        // Check the planes and return false if on positive side of either.
         return !plane[0].GetSide(pointLocal) && !plane[1].GetSide(pointLocal);
     }
 }
